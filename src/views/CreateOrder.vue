@@ -318,14 +318,15 @@ export default {
     },
 
     closeEditDialog(){
-      console.log(this.klArray[this.editedIndex-1])
+      let list = [...this.klArray]
       const index = this.editedIndex - 1
       let item = {
         kl_type: this.klTypeEdit,
         summa: this.summaEdit,
         currency: this.currencyEdit
       }
-      this.klArray[index] = {...item}
+      list[index] = {...item}
+      this.klArray = list
       this.dialogEdit = false
       console.log(this.klArray)
     },
