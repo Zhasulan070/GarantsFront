@@ -5,6 +5,37 @@
         <div class="form">
 
           <v-form>
+
+            <v-text-field
+                outlined
+                dense
+                v-model="uin"
+                label="Юшка"
+            >
+            </v-text-field>
+
+            <v-select
+                outlined
+                dense
+                v-model="form.filial"
+                :items="filials"
+                item-text="name"
+                item-value="id"
+                label="Филиалы"
+            >
+            </v-select>
+
+            <v-select
+                outlined
+                dense
+                v-model="form.requestType"
+                :items="requestTypes"
+                item-text="name"
+                item-value="id"
+                label="Тип заявки"
+            >
+            </v-select>
+
             <v-text-field
                 outlined
                 dense
@@ -34,7 +65,7 @@
                       flat
                   >
                     <v-toolbar-title>
-                      KL List
+                      Укажите список КЛ
                     </v-toolbar-title>
 
                     <v-divider
@@ -62,7 +93,7 @@
                             v-bind="attrs"
                             v-on="on"
                         >
-                          ADD Kl
+                          Добавить КЛ
                         </v-btn>
                       </template>
 
@@ -73,11 +104,14 @@
                                 outlined
                                 dense
                                 v-model="kl_type"
-                                :items="klTypes"
+                                :items="klArray"
                                 label="КЛ"
                             >
                             </v-select>
+
                             <v-text-field
+                                outlined
+                                dense
                                 v-model="summa"
                                 label="Сумма"
                             ></v-text-field>
@@ -86,7 +120,9 @@
                                 outlined
                                 dense
                                 v-model="currency"
-                                :items="['тенге','доллар','евро']"
+                                :items="currencies"
+                                item-text="name"
+                                item-value="name"
                                 label="Валюта"
                             >
                             </v-select>
@@ -142,7 +178,7 @@
                                 outlined
                                 dense
                                 v-model="klTypeEdit"
-                                :items="klTypes"
+                                :items="klArray"
                                 label="КЛ"
                             >
                             </v-select>
@@ -157,7 +193,9 @@
                                 outlined
                                 dense
                                 v-model="currencyEdit"
-                                :items="['тенге','доллар','евро']"
+                                :items="currencies"
+                                item-text="name"
+                                item-value="name"
                                 label="Валюта"
                             >
                             </v-select>
@@ -205,8 +243,6 @@
                   </v-icon>
                 </template>
 
-
-
               </v-data-table>
             </div>
 
@@ -216,10 +252,47 @@
                 v-model="beneficator"
                 label="Бенефициар"
             >
-              <!--              beneficator-->
             </v-text-field>
 
-            <!--            send button-->
+            <v-file-input
+                v-model="files"
+                color="deep-purple accent-4"
+                counter
+                label="Выберите Файлы"
+                multiple
+                prepend-icon="mdi-paperclip"
+                outlined
+                :show-size="1000"
+            >
+              <template v-slot:selection="{index, text}"
+              >
+                <v-chip
+                    v-if="index < 2"
+                    color="deep-purple accent-4"
+                    dark
+                    label
+                    small
+                >
+                  {{text}}
+                </v-chip>
+
+                <span
+                v-else-if="index===2"
+                class="text-overline greey--text text--darken-3 mx-2"
+                >
+                  +{{ files.length - 2 }} File(s)
+                </span>
+              </template>
+
+            </v-file-input>
+
+            <v-text-field
+                type="date"
+                v-model="date"
+            >
+
+            </v-text-field>
+
             <v-btn
                 outlined
                 dense
@@ -238,7 +311,7 @@
 </template>
 
 <script>
-// import axios from "axios";
+ import axios from "axios";
 
 export default {
   name: "CreateOrder",
@@ -247,43 +320,85 @@ export default {
     return{
       headers: [
         {
-          text: 'kl',
+          text: 'Вид КЛ',
           value: 'kl_type',
           sortable: false
         },
         {
-          text: 'Summa',
+          text: 'Сумма',
           value: 'summa',
           sortable: false
         },
         {
-          text: 'Currency',
+          text: 'Валюта',
           value: 'currency',
           sortable: false
         },
-        { text: 'Actions',
+        { text: 'Действие',
           value: 'actions',
           sortable: false
         }
       ],
-      dialog: false,
+      form:{
+        filial:'',
+        requestType: '',
+        currency: '',
+      },
+
+      date:[],
+      files: [],
+      requestTypes: [],
+      filials: [],
       klTypeEdit: '',
       summaEdit: '',
       currencyEdit: '',
       dialogEdit: false,
+      dialog: false,
       dialogDeleteItem: false,
-      klTypes: [],
       klArray: [],
       kl_type: '',
       summa: '',
-      currency: '',
+      currencies: [],
       bin: '',
+      uin:'',
       beneficator: '',
       name: '',
       result: {}
     }
   },
+
+  mounted() {
+    this.getFilials()
+    this.getCurrencies()
+    this.getRequestTypes()
+  },
+
   methods: {
+
+    getFilials: function (){
+      const headers = { "Content-Type": "application/json" };
+      axios.get("http://localhost:5000/api/GetReferences/GetFilials", { headers })
+          .then(response => {
+            this.filials = response.data.result
+          })
+    },
+
+    getCurrencies: function (){
+      const headers = { "Content-Type": "application/json" };
+      axios.get("http://localhost:5000/api/GetReferences/GetCurrencies", { headers })
+          .then(response => {
+            this.currencies = response.data.result
+          })
+    },
+
+    getRequestTypes: function (){
+      const headers = { "Content-Type": "application/json" };
+      axios.get("http://localhost:5000/api/GetReferences/GetRequestTypes", { headers })
+          .then(response => {
+            this.requestTypes = response.data.result
+          })
+    },
+
     pushKl: function (){
       this.klArray.push(
           {
@@ -328,7 +443,6 @@ export default {
       list[index] = {...item}
       this.klArray = list
       this.dialogEdit = false
-      console.log(this.klArray)
     },
 
     deleteItem (item) {
@@ -341,12 +455,11 @@ export default {
       this.closeDelete()
     },
 
-    submit:function (){
-      console.log(1)
-    }
-
     /*submit: function (){
       this.result = {
+        uin: this.uin,
+        filial: this.filial,
+        requestType: this.requestType,
         bin: this.bin,
         name: this.name,
         kl_array: this.klArray,
@@ -361,6 +474,7 @@ export default {
     }*/
 
   },
+
   computed: {
     showKlList() {
       return this.klArray.map(
@@ -370,6 +484,7 @@ export default {
           }))
     }
   },
+
   watch: {
     closeEditDialog(val){
       val || this.closeEditDialog()
@@ -377,27 +492,28 @@ export default {
 
     klArray(newVal){
       this.klArray = newVal;
-    }
-    /*bin(newVal){
+    },
+    
+    bin(newVal){
       if (newVal.length === 12) {
         console.log('get')
         const headers = { "Content-Type": "application/json" };
 
-        axios.get("https://api.npms.io/v2/search?q=vue", { headers })
+        axios.get("http://operflw-p-ap01:8080/api/Loans/GetCompanyByBIIN?iin=130340024549", { headers })
             .then(response => {
               let data = response.data
               this.name = data.name
-              const headers = { "Content-Type": "application/json" };
 
-              axios.get("https://api.npms.io/v2/search?q=vue", { headers })
-                  .then(response => {
-                    this.klTypes = response.data.kls
-                  })
+
+              // const headers = { "Content-Type": "application/json" };
+              // axios.get("https://api.npms.io/v2/search?q=vue", { headers })
+              //     .then(response => {
+              //       this.klTypes = response.data.kls
+              //     })
             })
 
       }
-    }*/
-
+    }
 
   }
 }

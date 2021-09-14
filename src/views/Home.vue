@@ -13,22 +13,26 @@
       </v-container>
     </v-app-bar>
 
-    <v-main>
+    <v-main class="form">
       <v-container>
         <v-form>
           <v-text-field
+              outlined
+              dense
               v-model="email"
               label="E-mail"
           ></v-text-field>
 
           <v-text-field
+              outlined
+              dense
               v-model="password"
               label="Password"
           ></v-text-field>
 
           <v-btn
               class="mr-4"
-              @click="submit"
+              @click="CheckAutentication"
           >
             submit
           </v-btn>
@@ -47,7 +51,8 @@ export default {
   name: 'Home',
   data(){
     return{
-      bin: ''
+      email:'',
+      password:''
     }
   },
   created() {
@@ -57,7 +62,16 @@ export default {
     console.log(2)
   },
   methods:{
-
+    CheckAutentication(){
+      if (this.email=="admin" && this.password=="admin")
+        this.$router.push('/main')
+    }
   }
 }
 </script>
+<style>
+.form{
+  width: 600px;
+  margin: 48px auto;
+}
+</style>
