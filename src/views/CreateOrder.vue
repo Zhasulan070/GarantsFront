@@ -1,11 +1,9 @@
 <template>
   <div>
     <v-main>
-      <v-container >
+      <v-container>
         <div class="form">
-
           <v-form>
-
             <v-text-field
                 outlined
                 dense
@@ -119,7 +117,7 @@
                             <v-select
                                 outlined
                                 dense
-                                v-model="currency"
+                                v-model="form.currency"
                                 :items="currencies"
                                 item-text="name"
                                 item-value="name"
@@ -221,12 +219,9 @@
                           </v-btn>
                         </v-card-actions>
                       </v-card>
-
                     </v-dialog>
-
                   </v-toolbar>
                 </template>
-
                 <template v-slot:item.actions="{ item }">
                   <v-icon
                       small
@@ -273,12 +268,12 @@
                     label
                     small
                 >
-                  {{text}}
+                  {{ text }}
                 </v-chip>
 
                 <span
-                v-else-if="index===2"
-                class="text-overline greey--text text--darken-3 mx-2"
+                    v-else-if="index===2"
+                    class="text-overline greey--text text--darken-3 mx-2"
                 >
                   +{{ files.length - 2 }} File(s)
                 </span>
@@ -289,10 +284,10 @@
             <v-text-field
                 type="date"
                 v-model="date"
+                outlined
+                label="Срок окончания"
             >
-
             </v-text-field>
-
             <v-btn
                 outlined
                 dense
@@ -311,13 +306,13 @@
 </template>
 
 <script>
- import axios from "axios";
+import axios from "axios";
 
 export default {
   name: "CreateOrder",
-  editedIndex:null,
-  data(){
-    return{
+  editedIndex: null,
+  data() {
+    return {
       headers: [
         {
           text: 'Вид КЛ',
@@ -334,18 +329,19 @@ export default {
           value: 'currency',
           sortable: false
         },
-        { text: 'Действие',
+        {
+          text: 'Действие',
           value: 'actions',
           sortable: false
         }
       ],
-      form:{
-        filial:'',
+      form: {
+        filial: '',
         requestType: '',
         currency: '',
       },
 
-      date:[],
+      date: [],
       files: [],
       requestTypes: [],
       filials: [],
@@ -360,7 +356,7 @@ export default {
       summa: '',
       currencies: [],
       bin: '',
-      uin:'',
+      uin: '',
       beneficator: '',
       name: '',
       result: {}
@@ -375,56 +371,56 @@ export default {
 
   methods: {
 
-    getFilials: function (){
-      const headers = { "Content-Type": "application/json" };
-      axios.get("http://localhost:5000/api/GetReferences/GetFilials", { headers })
+    getFilials: function () {
+      const headers = {"Content-Type": "application/json"};
+      axios.get("http://localhost:5000/api/GetReferences/GetFilials", {headers})
           .then(response => {
             this.filials = response.data.result
           })
     },
 
-    getCurrencies: function (){
-      const headers = { "Content-Type": "application/json" };
-      axios.get("http://localhost:5000/api/GetReferences/GetCurrencies", { headers })
+    getCurrencies: function () {
+      const headers = {"Content-Type": "application/json"};
+      axios.get("http://localhost:5000/api/GetReferences/GetCurrencies", {headers})
           .then(response => {
             this.currencies = response.data.result
           })
     },
 
-    getRequestTypes: function (){
-      const headers = { "Content-Type": "application/json" };
-      axios.get("http://localhost:5000/api/GetReferences/GetRequestTypes", { headers })
+    getRequestTypes: function () {
+      const headers = {"Content-Type": "application/json"};
+      axios.get("http://localhost:5000/api/GetReferences/GetRequestTypes", {headers})
           .then(response => {
             this.requestTypes = response.data.result
           })
     },
 
-    pushKl: function (){
+    pushKl: function () {
       this.klArray.push(
           {
-            kl_type:this.kl_type,
-            summa:this.summa,
-            currency:this.currency
+            kl_type: this.kl_type,
+            summa: this.summa,
+            currency: this.currency
           }
       )
-      this.kl_type=''
-      this.summa=''
-      this.currency=''
+      this.kl_type = ''
+      this.summa = ''
+      this.currency = ''
       this.dialog = false
     },
 
-    closeAddKl () {
-      this.kl_type=''
-      this.summa=''
-      this.currency=''
+    closeAddKl() {
+      this.kl_type = ''
+      this.summa = ''
+      this.currency = ''
       this.dialog = false
     },
 
-    closeDelete(){
+    closeDelete() {
       this.dialogDeleteItem = false
     },
 
-    editItem (item) {
+    editItem(item) {
       this.editedIndex = item.index
       this.klTypeEdit = item.kl_type
       this.summaEdit = item.summa
@@ -432,7 +428,7 @@ export default {
       this.dialogEdit = true
     },
 
-    closeEditDialog(){
+    closeEditDialog() {
       let list = [...this.klArray]
       const index = this.editedIndex - 1
       let item = {
@@ -445,17 +441,17 @@ export default {
       this.dialogEdit = false
     },
 
-    deleteItem (item) {
-      this.editedIndex = item.index-1
+    deleteItem(item) {
+      this.editedIndex = item.index - 1
       this.dialogDeleteItem = true
     },
 
-    deleteItemConfirm () {
-      this.klArray.splice(this.editedIndex,1)
+    deleteItemConfirm() {
+      this.klArray.splice(this.editedIndex, 1)
       this.closeDelete()
     },
 
-    /*submit: function (){
+    submit: function (){
       this.result = {
         uin: this.uin,
         filial: this.filial,
@@ -463,15 +459,16 @@ export default {
         bin: this.bin,
         name: this.name,
         kl_array: this.klArray,
-        beneficator: this.beneficator
+        beneficator: this.beneficator,
+        date: this.date
       }
       const headers = { "Content-Type": "application/json" };
 
-      axios.get("https://api.npms.io/v2/search?q=vue", { headers })
+      axios.post("https://api.npms.io/v2/search?q=vue", { headers })
           .then(response => {
             console.log(response)
           })
-    }*/
+    }
 
   },
 
@@ -486,20 +483,20 @@ export default {
   },
 
   watch: {
-    closeEditDialog(val){
+    closeEditDialog(val) {
       val || this.closeEditDialog()
     },
 
-    klArray(newVal){
+    klArray(newVal) {
       this.klArray = newVal;
     },
-    
-    bin(newVal){
+
+    bin(newVal) {
       if (newVal.length === 12) {
         console.log('get')
-        const headers = { "Content-Type": "application/json" };
+        const headers = {"Content-Type": "application/json"};
 
-        axios.get("http://operflw-p-ap01:8080/api/Loans/GetCompanyByBIIN?iin=130340024549", { headers })
+        axios.get("http://operflw-p-ap01:8080/api/Loans/GetCompanyByBIIN?iin=130340024549", {headers})
             .then(response => {
               let data = response.data
               this.name = data.name
@@ -520,16 +517,18 @@ export default {
 </script>
 
 <style scoped>
-.form{
+.form {
   width: 600px;
   margin: 48px auto;
 }
-.kl_form{
+
+.kl_form {
   margin-bottom: 24px;
   border: 1px solid #dddddd;
   padding: 12px;
 
 }
+
 .kl_form__content {
   margin-top: 12px;
 }
