@@ -25,7 +25,7 @@
       <div class="title">
         Данные по клиенту
       </div>
-      <div class="d-flex justify-space-between">
+      <div class="d-flex">
         <div class="block">
           <v-text-field
               v-model="company.bin"
@@ -46,7 +46,7 @@
               dense
           ></v-text-field>
         </div>
-        <div class="block">
+        <div class="block" style="margin-left: 100px">
           <v-text-field
               v-model="order.summa"
               outlined
@@ -65,7 +65,16 @@
               label="Дата окончания"
               dense
           ></v-text-field>
+        </div>
+        <div class="block" style="margin-left: 100px">
+          <v-text-field
+              v-model="company.files"
+              outlined
+              label="Файлы"
+              dense
+          ></v-text-field>
           <v-btn color="green">Скачать</v-btn>
+          <v-btn color="yellow" style="margin-left:8px">Добавить файлы</v-btn>
         </div>
       </div>
       <div class="title">
@@ -73,39 +82,39 @@
       </div>
       <div>
         <v-text-field
-            v-model="basicKl"
+            v-model="basicKl.datetimeCheck"
             outlined
-            label=""
+            label="Дата и Время проверки"
             dense
         ></v-text-field>
         <v-text-field
-            v-model="basicKl"
+            v-model="basicKl.segment"
             outlined
-            label=""
+            label="Сегмент"
             dense
         ></v-text-field>
         <v-text-field
-            v-model="basicKl"
+            v-model="basicKl.filialCode"
             outlined
-            label=""
+            label="Код Филиала"
             dense
         ></v-text-field>
         <v-text-field
-            v-model="basicKl"
+            v-model="basicKl.freeBalance"
             outlined
-            label=""
+            label="Свободный остаток"
             dense
         ></v-text-field>
         <v-text-field
-            v-model="basicKl"
+            v-model="basicKl.availablePeriod"
             outlined
-            label=""
+            label="Период доступности"
             dense
         ></v-text-field>
         <v-text-field
-            v-model="basicKl"
+            v-model="basicKl.creditLineStatus"
             outlined
-            label=""
+            label="Статус кредитной линий"
             dense
         ></v-text-field>
       </div>
@@ -115,12 +124,32 @@
       <div>
         sdasdas
       </div>
+      <div class="title" >
+        Дополнительные соглосования
+      </div>
+      <div>
+        <v-select
+            outlined
+            dense
+            v-model="form.checker"
+            :items="checkers"
+            item-text="name"
+            item-value="id"
+            label="Дополнительный Контроль"
+        >
+        </v-select>
+        <v-checkbox
+            v-model="checkboxCheker"
+            label='Отправить на Доп контроль ?'
+        >
+        </v-checkbox>
+      </div>
       <div class="title">
         <v-text-field
             dense
             outlined
             v-model="uin"
-            label="Введите ваш ЮШКА"
+            label="Введите вашу ЮШКУ"
         >
 
         </v-text-field>
@@ -143,17 +172,24 @@
 </template>
 
 <script>
+import axios from "axios";
+
 export default {
-  name: "Main",
+  name: "OrderDetail",
   data() {
     return {
       // data from API
+      form: {
+        checker: ''
+      },
       klNumber: '',
       orderType: '',
+      checkers: [],
       company: {
         name: '',
         bin: '',
-        segment: ''
+        segment: '',
+        files: ''
       },
       order: {
         summa: '',
@@ -170,12 +206,26 @@ export default {
       },
 
       // Complete
-      uin: ''
+      uin: '',
+      checkboxCheker: false
     }
+  },
+  mounted() {
+    this.getCheckers()
   },
   computed:{
     id() {
       return this.$route.params.id
+    }
+  },
+
+  methods: {
+    getCheckers: function (){
+      const headers = {"Content-Type": "application/json"};
+      axios.get("http://localhost:5000/api/GetCheckers", {headers})
+          .then(response => {
+            this.checkers = response.data.result
+          })
     }
   }
 }
@@ -183,8 +233,9 @@ export default {
 
 <style scoped>
 .block {
-  width: 400px;
+  width: 350px;
 }
+
 
 .title {
   padding: 16px 0;

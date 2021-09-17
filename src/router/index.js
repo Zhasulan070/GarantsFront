@@ -2,7 +2,7 @@ import Vue from 'vue'
 import VueRouter from 'vue-router'
 import Home from '../views/Home.vue'
 import CreateOrder from "@/views/CreateOrder";
-import Main from "@/views/Main";
+import OrderDetail from "@/views/OrderDetail";
 import OrderList from "@/views/OrderList";
 
 Vue.use(VueRouter)
@@ -20,8 +20,8 @@ const routes = [
   },
   {
     path: '/order-detail/:id',
-    name: 'Main',
-    component: Main
+    name: 'OrderDetail',
+    component: OrderDetail
   }
   ,
   {

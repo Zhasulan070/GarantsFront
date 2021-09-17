@@ -1,5 +1,11 @@
 <template>
   <div>
+    <v-app-bar
+        elevation="1"
+        color="white"
+    >
+
+    </v-app-bar>
     <v-data-table
         :headers="cols"
         :items="rows"
@@ -20,6 +26,7 @@
 </template>
 
 <script>
+import axios from "axios";
 export default {
   name: "OrderList",
   data() {
@@ -46,6 +53,14 @@ export default {
       ]
     }
   },
+  mounted() {
+    const headers = {"Content-Type": "application/json"};
+    axios.get("http://localhost:5000/api/GetCompanyNameByBin?bin=", {headers})
+        .then(response => {
+          this.name = response.data.result
+        })
+  },
+
   methods: {
     detailView(item) {
       console.log(item)

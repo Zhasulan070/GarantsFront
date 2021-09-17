@@ -288,6 +288,7 @@
                 label="Срок окончания"
             >
             </v-text-field>
+
             <v-btn
                 outlined
                 dense
@@ -352,7 +353,7 @@ export default {
       dialog: false,
       dialogDeleteItem: false,
       klArray: [],
-      kl_type: '',
+      kl_type: 1,
       summa: '',
       currencies: [],
       bin: '',
@@ -400,12 +401,9 @@ export default {
           {
             kl_type: this.kl_type,
             summa: this.summa,
-            currency: this.currency
+            currency: this.form.currency
           }
       )
-      this.kl_type = ''
-      this.summa = ''
-      this.currency = ''
       this.dialog = false
     },
 
@@ -454,20 +452,22 @@ export default {
     submit: function (){
       this.result = {
         uin: this.uin,
-        filial: this.filial,
-        requestType: this.requestType,
+        filial: this.form.filial,
+        requestType: this.form.requestType,
         bin: this.bin,
         name: this.name,
         kl_array: this.klArray,
         beneficator: this.beneficator,
         date: this.date
       }
-      const headers = { "Content-Type": "application/json" };
+
+      console.log(this.result)
+      /*const headers = { "Content-Type": "application/json" };
 
       axios.post("https://api.npms.io/v2/search?q=vue", { headers })
           .then(response => {
             console.log(response)
-          })
+          })*/
     }
 
   },
@@ -493,19 +493,17 @@ export default {
 
     bin(newVal) {
       if (newVal.length === 12) {
-        console.log('get')
         const headers = {"Content-Type": "application/json"};
 
-        axios.get("http://operflw-p-ap01:8080/api/Loans/GetCompanyByBIIN?iin=130340024549", {headers})
+        axios.get("http://localhost:5000/api/GetCompanyNameByBin?bin=" + newVal, {headers})
             .then(response => {
-              let data = response.data
-              this.name = data.name
+              this.name = response.data.result
 
 
               // const headers = { "Content-Type": "application/json" };
-              // axios.get("https://api.npms.io/v2/search?q=vue", { headers })
+              // axios.get("http://localhost:5000/api/GetCompanyNameByBin?bin=" + newVal, { headers })
               //     .then(response => {
-              //       this.klTypes = response.data.kls
+              //       console.log(response.data)
               //     })
             })
 
@@ -518,7 +516,7 @@ export default {
 
 <style scoped>
 .form {
-  width: 600px;
+  width: 750px;
   margin: 48px auto;
 }
 
