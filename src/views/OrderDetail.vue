@@ -212,6 +212,7 @@ export default {
   },
   mounted() {
     this.getCheckers()
+
   },
   computed:{
     id() {

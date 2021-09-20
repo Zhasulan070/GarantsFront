@@ -19,22 +19,23 @@
           <v-text-field
               outlined
               dense
-              v-model="email"
-              label="E-mail"
+              v-model="username"
+              label="Юзернейм"
           ></v-text-field>
 
           <v-text-field
               outlined
               dense
               v-model="password"
-              label="Password"
+              type="password"
+              label="Пароль"
           ></v-text-field>
 
           <v-btn
               class="mr-4"
-              @click="CheckAutentication"
+              @click="submit"
           >
-            submit
+            Войти
           </v-btn>
 
         </v-form>
@@ -45,26 +46,33 @@
   </div>
 </template>
 
-<script>
+<script lang="ts">
 
 export default {
   name: 'Home',
   data(){
     return{
-      email:'',
+      username:'',
       password:''
     }
   },
-  created() {
-    console.log(1)
-  },
+
   mounted() {
-    console.log(2)
+
   },
+
   methods:{
-    CheckAutentication(){
-      if (this.email=="admin" && this.password=="admin")
-        this.$router.push('/main')
+    submit: function (){
+      fetch("http://localhost:5000/api/Auth/login",{
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        credentials: 'include',
+        body: JSON.stringify({
+          username: this.username,
+          password:this.password
+        })
+      })
+
     }
   }
 }
