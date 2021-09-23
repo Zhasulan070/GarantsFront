@@ -12,6 +12,9 @@ import 'bootstrap-vue/dist/bootstrap-vue.css'
 Vue.use(BootstrapVue)
 // Optionally install the BootstrapVue icon components plugin
 Vue.use(IconsPlugin)
+import VueCookies from 'vue-cookies';
+
+Vue.use(VueCookies);
 
 Vue.config.productionTip = false
 

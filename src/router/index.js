@@ -6,7 +6,7 @@ import OrderDetail from "@/views/OrderDetail";
 import OrderList from "@/views/OrderList";
 
 Vue.use(VueRouter)
-
+// import store from '@/store/index'
 const routes = [
   {
     path: '/',
@@ -22,8 +22,7 @@ const routes = [
     path: '/order-detail/:id',
     name: 'OrderDetail',
     component: OrderDetail
-  }
-  ,
+  },
   {
     path: '/orders',
     name: 'Orders',
@@ -37,4 +36,19 @@ const router = new VueRouter({
   routes
 })
 
+// router.beforeEach((to, from, next) => {
+//   console.log(store.getters['isLoggedIn'])
+//   if (store.getters['isLoggedIn']) {
+//     console.log(10)
+//     return next()
+//   }else {
+//     console.log(to.fullPath)
+//     if (to.fullPath === '/') {
+//       next();
+//       return
+//     }
+//     next("/");
+//     return;
+//   }
+// })
 export default router

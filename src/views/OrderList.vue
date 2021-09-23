@@ -1,25 +1,27 @@
 <template>
   <div>
     <v-app-bar
-        elevation="1"
-        color="white"
+        color="teal lighten-3"
+        hide-on-scroll
     >
 
     </v-app-bar>
-    <v-data-table
-        :headers="cols"
-        :items="rows"
-        no-results-text="Нет данных"
+    <v-data-table class="form"
+                  :headers="cols"
+                  :items="showOrderList"
+                  no-results-text="Нет данных"
     >
       <template v-slot:item.action="{item}">
-        <v-btn small>
-          <router-link :to="`/order-detail/${item.id}`">
-            Подробнее
-          </router-link>
-        </v-btn>
+
+        <router-link :to="`/order-detail/${item.id}`" tag="div" :disabled="item.status === 'your_status'">
+          <v-btn small :disabled="item.status === 'your_status'">
+            {{ item.status === 'your_status' ? 'В работе' : 'Подолбнее' }}
+          </v-btn>
+        </router-link>
+
       </template>
       <template slot="no-data">
-          Нет данных
+        Нет данных
       </template>
     </v-data-table>
   </div>
@@ -27,48 +29,101 @@
 
 <script>
 import axios from "axios";
+import {mapGetters} from "vuex";
+
 export default {
   name: "OrderList",
   data() {
     return {
+      array: [],
+      user: {},
       cols: [
         {
-          text: 'Имя',
-          value: 'name',
+          text: '#',
+          value: 'id',
+          sortable: false
         },
         {
-          text: '',
+          text: 'Имя',
+          value: 'companyName',
+          sortable: false
+        },
+        {
+          text: 'Бин',
+          value: 'bin',
+          sortable: false
+        },
+        {
+          text: 'Статус',
+          value: 'status',
+          sortable: false
+        },
+        {
+          text: 'Юшка',
+          value: 'kmEmail',
+          sortable: false
+        },
+        {
+          text: 'Бенефициар',
+          value: 'beneficator',
+          sortable: false
+        },
+        {
+          text: 'Тип запроса',
+          value: 'requestType',
+          sortable: false
+        },
+        {
+          text: 'Филиал',
+          value: 'filial',
+          sortable: false
+        },
+        {
+          text: 'Сегмент',
+          value: 'segment',
+          sortable: false
+        },
+        {
+          text: 'Действия',
           value: 'action',
+          sortable: false
         },
       ],
-      rows: [
-        {
-          id: 1,
-          name: 'Frozen Yogurt',
-        },
-        {
-          id: 2,
-          name: 'Ice cream sandwich',
-        },
-      ]
     }
+  },
+  created() {
+    this.user = JSON.parse(JSON.stringify(this.userData))
   },
   mounted() {
     const headers = {"Content-Type": "application/json"};
-    axios.get("http://localhost:5000/api/GetCompanyNameByBin?bin=", {headers})
+    axios.get(
+        `http://localhost:5000/api/Order/GetOrdersByUserId?userId=${this.user.id}`,
+        {headers})
         .then(response => {
-          this.name = response.data.result
+          this.array = response.data.result
         })
   },
 
-  methods: {
-    detailView(item) {
-      console.log(item)
+  computed: {
+    ...mapGetters({
+      userData: 'getUserData'
+    }),
+    showOrderList() {
+      return this.array.map(
+          (items, index) => ({
+            ...items,
+            index: index + 1
+          }))
     }
-  }
+  },
+
+  methods: {}
 }
 </script>
 
 <style scoped>
-
+.form {
+  width: 1750px;
+  margin: 0 auto;
+}
 </style>

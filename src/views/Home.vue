@@ -33,7 +33,7 @@
 
           <v-btn
               class="mr-4"
-              @click="submit"
+              @click="login"
           >
             Войти
           </v-btn>
@@ -47,6 +47,9 @@
 </template>
 
 <script lang="ts">
+// import router from "../router";
+import axios from "axios";
+import {mapGetters} from "vuex";
 
 export default {
   name: 'Home',
@@ -60,19 +63,34 @@ export default {
   mounted() {
 
   },
-
+  computed: {
+    ...mapGetters({
+      userData: 'getUserData'
+    })
+  },
   methods:{
-    submit: function (){
-      fetch("http://localhost:5000/api/Auth/login",{
-        method: 'POST',
-        headers: {'Content-Type': 'application/json'},
-        credentials: 'include',
-        body: JSON.stringify({
-          username: this.username,
-          password:this.password
-        })
-      })
+    async submit(){
+      const params = {
+        username: this.username,
+        password:this.password
+      }
+      let {data} = await axios.post(
+          "http://localhost:5000/api/Auth/loginByUserId", params,
+          {withCredentials: true}
+      )
+      return data
+    },
+    login() {
+      this.submit().then((data) => {
+        if (data.statusCode > -1) {
+          this.$store.commit('setUserData', data.result)
+          setTimeout(()=> {
+            this.$router.push('/orders')
 
+          }, 2000)
+
+        }
+      })
     }
   }
 }

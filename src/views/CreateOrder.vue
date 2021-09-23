@@ -50,6 +50,17 @@
             >
             </v-text-field>
 
+            <v-select
+                outlined
+                dense
+                v-model="form.segmentType"
+                :items="segmentTypes"
+                item-text="name"
+                item-value="id"
+                label="Сегмент"
+            >
+            </v-select>
+
             <div class="kl_form">
               <v-data-table
                   :headers="headers"
@@ -101,8 +112,10 @@
                             <v-select
                                 outlined
                                 dense
-                                v-model="kl_type"
-                                :items="klArray"
+                                v-model="form.kl_type"
+                                :items="kl_types"
+                                item-text="nameKl"
+                                item-value="nameKl"
                                 label="КЛ"
                             >
                             </v-select>
@@ -120,10 +133,18 @@
                                 v-model="form.currency"
                                 :items="currencies"
                                 item-text="name"
-                                item-value="name"
+                                item-value="id"
                                 label="Валюта"
                             >
                             </v-select>
+
+                            <v-text-field
+                                outlined
+                                dense
+                                v-model="validDate"
+                                label="Срок(месяцев)"
+                            >
+                            </v-text-field>
                           </v-container>
                         </v-card-text>
 
@@ -134,7 +155,7 @@
                               text
                               @click="closeAddKl"
                           >
-                            Cancel
+                            Закрыть
                           </v-btn>
 
                           <v-btn
@@ -142,7 +163,7 @@
                               text
                               @click="pushKl"
                           >
-                            Save
+                            Добавить
                           </v-btn>
                         </v-card-actions>
                       </v-card>
@@ -154,11 +175,11 @@
                         max-width="500px"
                     >
                       <v-card>
-                        <v-card-title class="text-h5">Are you sure you want to delete this item?</v-card-title>
+                        <v-card-title class="text-h5">Вы уверены что хотите удалить КЛ?</v-card-title>
                         <v-card-actions>
                           <v-spacer></v-spacer>
-                          <v-btn color="blue darken-1" text @click="closeDelete">Cancel</v-btn>
-                          <v-btn color="blue darken-1" text @click="deleteItemConfirm">OK</v-btn>
+                          <v-btn color="blue darken-1" text @click="closeDelete">Закрыть</v-btn>
+                          <v-btn color="blue darken-1" text @click="deleteItemConfirm">Да</v-btn>
                           <v-spacer></v-spacer>
                         </v-card-actions>
                       </v-card>
@@ -176,7 +197,7 @@
                                 outlined
                                 dense
                                 v-model="klTypeEdit"
-                                :items="klArray"
+                                :items="kl_types"
                                 label="КЛ"
                             >
                             </v-select>
@@ -197,6 +218,15 @@
                                 label="Валюта"
                             >
                             </v-select>
+
+                            <v-text-field
+                                outlined
+                                dense
+                                v-model="validDateEdit"
+                                label="Срок(месяцев)"
+                            >
+                            </v-text-field>
+
                           </v-container>
                         </v-card-text>
 
@@ -207,7 +237,7 @@
                               text
                               @click="dialogEdit = false"
                           >
-                            Cancel
+                            Закрыть
                           </v-btn>
 
                           <v-btn
@@ -215,7 +245,7 @@
                               text
                               @click="closeEditDialog"
                           >
-                            Edit
+                            Изменить
                           </v-btn>
                         </v-card-actions>
                       </v-card>
@@ -245,47 +275,7 @@
                 outlined
                 dense
                 v-model="beneficator"
-                label="Бенефициар"
-            >
-            </v-text-field>
-
-            <v-file-input
-                v-model="files"
-                color="deep-purple accent-4"
-                counter
-                label="Выберите Файлы"
-                multiple
-                prepend-icon="mdi-paperclip"
-                outlined
-                :show-size="1000"
-            >
-              <template v-slot:selection="{index, text}"
-              >
-                <v-chip
-                    v-if="index < 2"
-                    color="deep-purple accent-4"
-                    dark
-                    label
-                    small
-                >
-                  {{ text }}
-                </v-chip>
-
-                <span
-                    v-else-if="index===2"
-                    class="text-overline greey--text text--darken-3 mx-2"
-                >
-                  +{{ files.length - 2 }} File(s)
-                </span>
-              </template>
-
-            </v-file-input>
-
-            <v-text-field
-                type="date"
-                v-model="date"
-                outlined
-                label="Срок окончания"
+                label=" Название бенефициара"
             >
             </v-text-field>
 
@@ -296,7 +286,7 @@
                 @click="submit"
                 color="#4fe612"
             >
-              Отправить
+              Направить заявку в ДКА
             </v-btn>
 
           </v-form>
@@ -308,6 +298,7 @@
 
 <script>
 import axios from "axios";
+import router from "../router";
 
 export default {
   name: "CreateOrder",
@@ -331,6 +322,11 @@ export default {
           sortable: false
         },
         {
+          text: 'Срок(месяцев)',
+          value: 'validDate',
+          sortable: false
+        },
+        {
           text: 'Действие',
           value: 'actions',
           sortable: false
@@ -340,26 +336,30 @@ export default {
         filial: '',
         requestType: '',
         currency: '',
+        kl_type: '',
+        segmentType:''
       },
 
-      date: [],
-      files: [],
+      validDate:'',
+      kl_types: [],
       requestTypes: [],
+      segmentTypes: [],
       filials: [],
       klTypeEdit: '',
       summaEdit: '',
+      validDateEdit: '',
       currencyEdit: '',
       dialogEdit: false,
       dialog: false,
       dialogDeleteItem: false,
       klArray: [],
-      kl_type: 1,
       summa: '',
       currencies: [],
       bin: '',
       uin: '',
       beneficator: '',
       name: '',
+      counter: 0,
       result: {}
     }
   },
@@ -368,6 +368,7 @@ export default {
     this.getFilials()
     this.getCurrencies()
     this.getRequestTypes()
+    this.getSegments()
   },
 
   methods: {
@@ -396,21 +397,35 @@ export default {
           })
     },
 
+    getSegments: function () {
+      const headers = {"Content-Type": "application/json"};
+      axios.get("http://localhost:5000/api/GetReferences/GetSegments", {headers})
+          .then(response => {
+            this.segmentTypes = response.data.result
+          })
+    },
+
     pushKl: function () {
       this.klArray.push(
           {
-            kl_type: this.kl_type,
+            currency: this.form.currency,
+            kl_type: this.form.kl_type,
             summa: this.summa,
-            currency: this.form.currency
+            validDate: this.validDate
           }
       )
+      this.form.currency = ''
+      this.form.kl_type = ''
+      this.summa = ''
+      this.validDate = ''
       this.dialog = false
     },
 
     closeAddKl() {
-      this.kl_type = ''
+      this.form.kl_type = ''
       this.summa = ''
-      this.currency = ''
+      this.form.currency = ''
+      this.validDate = ''
       this.dialog = false
     },
 
@@ -423,6 +438,7 @@ export default {
       this.klTypeEdit = item.kl_type
       this.summaEdit = item.summa
       this.currencyEdit = item.currency
+      this.validDateEdit = item.validDate
       this.dialogEdit = true
     },
 
@@ -432,7 +448,8 @@ export default {
       let item = {
         kl_type: this.klTypeEdit,
         summa: this.summaEdit,
-        currency: this.currencyEdit
+        currency: this.currencyEdit,
+        validDate: this.validDateEdit
       }
       list[index] = {...item}
       this.klArray = list
@@ -450,24 +467,26 @@ export default {
     },
 
     submit: function (){
-      this.result = {
+      this.result = JSON.stringify({
         uin: this.uin,
         filial: this.form.filial,
         requestType: this.form.requestType,
+        segmentType: this.form.segmentType,
         bin: this.bin,
         name: this.name,
         kl_array: this.klArray,
-        beneficator: this.beneficator,
-        date: this.date
-      }
+        beneficator: this.beneficator
+      })
 
-      console.log(this.result)
-      /*const headers = { "Content-Type": "application/json" };
+      const requestOptions = {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: this.result
+      };
+      fetch("http://localhost:5000/api/Order/CreateOrder", requestOptions)
+          .then(response => response.json());
 
-      axios.post("https://api.npms.io/v2/search?q=vue", { headers })
-          .then(response => {
-            console.log(response)
-          })*/
+      router.push('/')
     }
 
   },
@@ -498,13 +517,11 @@ export default {
         axios.get("http://localhost:5000/api/GetCompanyNameByBin?bin=" + newVal, {headers})
             .then(response => {
               this.name = response.data.result
+            })
 
-
-              // const headers = { "Content-Type": "application/json" };
-              // axios.get("http://localhost:5000/api/GetCompanyNameByBin?bin=" + newVal, { headers })
-              //     .then(response => {
-              //       console.log(response.data)
-              //     })
+        axios.get("http://localhost:5000/api/GetCompanyKl/ByBin?bin=" + newVal, {headers})
+            .then(response => {
+              this.kl_types = response.data.result
             })
 
       }
