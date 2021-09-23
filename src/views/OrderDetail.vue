@@ -15,7 +15,7 @@
 
 
     </v-app-bar>
-    <v-container v-if="user.role === 'sadsa'">
+    <v-container v-if="this.user['positionId'] === 13">
       <div class="title">
         Заявка №  {{id}}
       </div>
@@ -180,13 +180,14 @@
         </v-btn>
       </div>
     </v-container>
-    <v-container v-if="user.role === 'asdasd'"></v-container>
+<!--    <v-container v-if="user.role === 'asdasd'"></v-container>-->
   </div>
 
 </template>
 
 <script>
 import axios from "axios";
+import {mapGetters} from "vuex";
 
 export default {
   name: "OrderDetail",
@@ -194,6 +195,7 @@ export default {
     return {
       // data from API
       klarray:[],
+      user: {},
       klColsArray:[],
       klCols:[
         {
@@ -285,6 +287,11 @@ export default {
       checkboxCheker: false
     }
   },
+
+  created() {
+    this.user = JSON.parse(JSON.stringify(this.userData))
+  },
+
   async mounted() {
     this.getCheckers()
     await this.getKompanyInfo()
@@ -300,7 +307,10 @@ export default {
             ...items,
             index: index + 1
           }))
-    }
+    },
+    ...mapGetters({
+      userData: 'getUserData'
+    }),
   },
 
   methods: {
@@ -354,8 +364,9 @@ export default {
 
     async getKompanyInfo(){
       const headers = {"Content-Type": "application/json"};
-      await axios.get("http://localhost:5000/api/Order/GetOrderByUserIdAndOrderId?userId=1"+"&orderId=" + this.id , {headers})
-          .then(response => {
+      await axios.get(
+          `http://localhost:5000/api/Order/GetOrderByUserIdAndOrderId?userId=${this.user.id}&orderId=${this.id}`,
+          {headers}).then(response => {
             console.log(response.data.result)
             this.klNumber = response.data.result['loanNumber']
             this.currencyId = response.data.result['currencyId']

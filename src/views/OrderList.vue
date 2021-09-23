@@ -14,8 +14,8 @@
       <template v-slot:item.action="{item}">
 
         <router-link :to="`/order-detail/${item.id}`" tag="div" :disabled="item.status === 'your_status'">
-          <v-btn small :disabled="item.status === 'your_status'">
-            {{ item.status === 'your_status' ? 'В работе' : 'Подолбнее' }}
+          <v-btn @click="changeStatus" small :disabled="item.status === 'your_status'">
+            {{ item.status === 'your_status' ? 'В работе' : 'Подробнее' }}
           </v-btn>
         </router-link>
 
@@ -97,7 +97,7 @@ export default {
   mounted() {
     const headers = {"Content-Type": "application/json"};
     axios.get(
-        `http://localhost:5000/api/Order/GetOrdersByUserId?userId=${this.user.id}`,
+        `http://localhost:5000/api/Order/GetOrdersByUserId?userId=${this.user.id}&positionId=${this.user['positionId']}`,
         {headers})
         .then(response => {
           this.array = response.data.result
@@ -117,7 +117,11 @@ export default {
     }
   },
 
-  methods: {}
+  methods: {
+    changeStatus:function (){
+
+    }
+  }
 }
 </script>
 
